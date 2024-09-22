@@ -23,7 +23,9 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setShowLogoSeal(true); // Show logo seal
+    setSubmitted(true); // Mark form as submitted
+    setMessage('Applied successfully');
     // Convert UID to lowercase before submitting
     const updatedFormData = {
       ...formData,
@@ -36,38 +38,40 @@ function App() {
 
       envelope.classList.add('show-envelope'); // Show envelope
       formContainer.classList.add('animate'); // Trigger form fade-out
-
+      setTimeout(() => {
+        animateEnvelope();
+      }, 100);
       // Show the logo seal after a delay (envelope animation duration)
       setTimeout(() => {
         setShowLogoSeal(true);
       }, 1000); // Adjust delay based on envelope animation duration
     };
 
-    try {
-      const response = await fetch('http://localhost:3001/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedFormData),
-      });
+  //   try {
+  //     const response = await fetch('http://localhost:3001/api/register', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(updatedFormData),
+  //     });
 
-      const data = await response.json();
-      if (response.status === 201) {
-        setMessage('Applied successfully');
-        setSubmitted(true);
+  //     const data = await response.json();
+  //     if (response.status === 201) {
+  //       setMessage('Applied successfully');
+  //       setSubmitted(true);
 
-        // Trigger animations after a slight delay
-        setTimeout(() => {
-          animateEnvelope();
-        }, 100); // Adjust delay if needed
-      } else {
-        setMessage(data.message);
-      }
-    } catch (error) {
-      setMessage('Error submitting form');
-    }
-  };
+  //       // Trigger animations after a slight delay
+  //       setTimeout(() => {
+  //         animateEnvelope();
+  //       }, 100); // Adjust delay if needed
+  //     } else {
+  //       setMessage(data.message);
+  //     }
+  //   } catch (error) {
+  //     setMessage('Error submitting form');
+  //   }
+   };
 
   return (
     <div className="container">
