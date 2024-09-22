@@ -1,182 +1,98 @@
-import React, { useState } from 'react';
-import './App.css';
+import React, { useState, useEffect } from 'react';
 
-function App() {
-  const [formData, setFormData] = useState({
-    name: '',
-    uid: '',
-    department: '',
-    occupation: '',
-    email: '',
-  });
+export default function Component() {
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [formHeight, setFormHeight] = useState(260);
+  const [formPosition, setFormPosition] = useState(-30);
 
-  const [message, setMessage] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [showLogoSeal, setShowLogoSeal] = useState(false);
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSubmitted(true);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setShowLogoSeal(true); // Show logo seal
-    setSubmitted(true); // Mark form as submitted
-    setMessage('Applied successfully');
-    // Convert UID to lowercase before submitting
-    const updatedFormData = {
-      ...formData,
-      uid: formData.uid.toLowerCase(),
-    };
+  useEffect(() => {
+    if (isSubmitted) {
+      const foldInterval = setInterval(() => {
+        setFormHeight((prevHeight) => {
+          if (prevHeight > 0) {
+            return prevHeight - 5;
+          } else {
+            clearInterval(foldInterval);
+            return 0;
+          }
+        });
+        setFormPosition((prevPosition) => {
+          if (prevPosition < 0) {
+            return prevPosition + 1;
+          } else {
+            return 0;
+          }
+        });
+      }, 20);
+    }
+  }, [isSubmitted]);
 
-    const animateEnvelope = () => {
-      const envelope = document.querySelector('.envelope');
-      const formContainer = document.querySelector('.form-container');
+  const formStyle = {
+    width: '260px',
+    height: `${formHeight}px`,
+    backgroundColor: 'white',
+    border: '1px solid #ccc',
+    padding: '20px',
+    transition: 'height 0.25s, transform 0.25s',
+    overflow: 'hidden',
+    transformOrigin: 'top',
+    transform: `translateY(${formPosition}px) ${isSubmitted ? 'perspective(1000px) rotateX(-90deg)' : 'rotateX(0)'}`,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  };
 
-      envelope.classList.add('show-envelope'); // Show envelope
-      formContainer.classList.add('animate'); // Trigger form fade-out
-      setTimeout(() => {
-        animateEnvelope();
-      }, 100);
-      // Show the logo seal after a delay (envelope animation duration)
-      setTimeout(() => {
-        setShowLogoSeal(true);
-      }, 1000); // Adjust delay based on envelope animation duration
-    };
+  const envelopeStyle = {
+    width: '340px',
+    height: '340px',
+    backgroundColor: '#f0f0f0',
+    border: '1px solid #999',
+    position: 'relative',
+    overflow: 'hidden',
+    display: 'grid',
+    placeItems: 'center',
+  };
 
-  //   try {
-  //     const response = await fetch('http://localhost:3001/api/register', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(updatedFormData),
-  //     });
+  const flapStyle = {
+    width: '0',
+    height: '0',
+    borderLeft: '170px solid transparent',
+    borderRight: '170px solid transparent',
+    borderTop: '120px solid #e0e0e0',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    transform: isSubmitted ? 'rotateX(0)' : 'rotateX(-180deg)',
+    transformOrigin: 'top',
+    transition: 'transform 1s',
+    transitionDelay: '0.75s',
+  };
 
-  //     const data = await response.json();
-  //     if (response.status === 201) {
-  //       setMessage('Applied successfully');
-  //       setSubmitted(true);
-
-  //       // Trigger animations after a slight delay
-  //       setTimeout(() => {
-  //         animateEnvelope();
-  //       }, 100); // Adjust delay if needed
-  //     } else {
-  //       setMessage(data.message);
-  //     }
-  //   } catch (error) {
-  //     setMessage('Error submitting form');
-  //   }
-   };
+  const inputStyle = {
+    width: '100%',
+    marginBottom: '10px',
+    padding: '5px',
+    boxSizing: 'border-box',
+  };
 
   return (
-    <div className="container">
-      <video className="video-background" autoPlay loop muted>
-        <source src="back.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-      <div className={`form-wrapper ${submitted ? 'submitted' : ''}`}>
-        <div className="form-container">
-          {message ? (
-            <h2>{message}</h2>
-          ) : (
-            <form onSubmit={handleSubmit} className="application-form">
-              <div>
-                <h1 className="abc">Register Now!</h1>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Name"
-                  style={{ marginTop: 30 }}
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <input
-                  type="text"
-                  name="uid"
-                  placeholder="UID"
-                  value={formData.uid}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <input
-                  type="text"
-                  name="department"
-                  placeholder="Department"
-                  value={formData.department}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <select
-                  name="occupation"
-                  value={formData.occupation}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select an option</option>
-                  <option value="Student">Student</option>
-                  <option value="Engineer">Engineer</option>
-                  <option value="Designer">Designer</option>
-                  <option value="Manager">Manager</option>
-                </select>
-              </div>
-              <button type="submit">Apply</button>
-            </form>
-          )}
-        </div>
-
-        {/* Envelope remains hidden until submitted */}
-        <div
-        style={{marginLeft:300}}
-          id="envelope"
-          className={`envelope ${submitted ? 'show-envelope' : ''} ${
-            showLogoSeal ? 'show-logo' : ''
-          }`}
-        >
-          <div className="envelope-flap"></div>
-          <div>
-            <img className="logoseal" src="Cac_logo.png" alt="Logo Seal" />
-          </div>
-          <div className="envelope-content">Thank you for applying!</div>
-        </div>
-      </div>
-      <div className="info-container">
-        {submitted ? (
-          <>
-            <h1 className="prob">With us</h1>
-          </>
-        ) : (
-          <>
-            <h1>
-              Create <span style={{ color: '#B22A2A' }}>memories</span> of life
-              time
-            </h1>
-          </>
-        )}
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'Arial, sans-serif' }}>
+      <div style={envelopeStyle}>
+        <div style={flapStyle}></div>
+        <form onSubmit={handleSubmit} style={formStyle}>
+          <input type="text" placeholder="Name" style={inputStyle} />
+          <input type="email" placeholder="Email" style={inputStyle} />
+          <textarea placeholder="Message" style={{ ...inputStyle, height: '100px', resize: 'none' }} />
+          <button type="submit" style={{ padding: '5px 10px', backgroundColor: '#007bff', color: 'white', border: 'none', cursor: 'pointer', alignSelf: 'flex-start' }}>
+            Submit
+          </button>
+        </form>
       </div>
     </div>
   );
 }
-
-export default App;
